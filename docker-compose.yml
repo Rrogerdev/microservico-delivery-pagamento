@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   pagamento:
     build:
@@ -30,8 +28,8 @@ services:
     #   db:
     #     condition: service_healthy
 
-    networks:
-      - biblioteca-net
+    #networks:
+    #  - biblioteca-net
 
     logging:
       driver: "json-file"
