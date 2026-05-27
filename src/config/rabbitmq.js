@@ -11,19 +11,18 @@ let connecting = false;
 
 
 const QUEUES = {
-  CUPONS:      'cupons_queue',
-  PEDIDOS:     'pedidos_queue',
-  DEAD_LETTER: 'dead_letter_queue',
+  CUPONS:     'delivery_cupons_queue',
+  PAGAMENTOS: 'delivery_pagamentos_queue',
 };
 
 
 const EVENTS = {
-  CUPOM_CRIADO:      'cupom.criado',
-  CUPOM_ATUALIZADO:  'cupom.atualizado',
-  CUPOM_REMOVIDO:    'cupom.removido',
-  PEDIDO_CRIADO:     'pedido.criado',
-  PEDIDO_ATUALIZADO: 'pedido.atualizado',
-  PEDIDO_REMOVIDO:   'pedido.removido',
+  CUPOM_CRIADO:         'cupom.criado',
+  CUPOM_ATUALIZADO:     'cupom.atualizado',
+  CUPOM_REMOVIDO:       'cupom.removido',
+  PAGAMENTO_CRIADO:     'pagamento.criado',
+  PAGAMENTO_ATUALIZADO: 'pagamento.atualizado',
+  PAGAMENTO_REMOVIDO:   'pagamento.removido',
 };
 
 async function connect() {
@@ -37,27 +36,16 @@ async function connect() {
 
     await channel.prefetch(1);
 
-    // Garante a existência das Exchanges
+
     await channel.assertExchange(EXCHANGE, EXCHANGE_TYPE, { durable: true });
-    await channel.assertExchange('dead_letter_exchange', 'direct', { durable: true });
 
 
-    await channel.assertQueue(QUEUES.CUPONS, {
-      durable: true,
-      arguments: { 'x-dead-letter-exchange': 'dead_letter_exchange' },
-    });
+    await channel.assertQueue(QUEUES.CUPONS, { durable: true });
     await channel.bindQueue(QUEUES.CUPONS, EXCHANGE, 'cupom.#');
 
 
-    await channel.assertQueue(QUEUES.PEDIDOS, {
-      durable: true,
-      arguments: { 'x-dead-letter-exchange': 'dead_letter_exchange' },
-    });
-    await channel.bindQueue(QUEUES.PEDIDOS, EXCHANGE, 'pedido.#');
-
-
-    await channel.assertQueue(QUEUES.DEAD_LETTER, { durable: true });
-    await channel.bindQueue(QUEUES.DEAD_LETTER, 'dead_letter_exchange', '');
+    await channel.assertQueue(QUEUES.PAGAMENTOS, { durable: true });
+    await channel.bindQueue(QUEUES.PAGAMENTOS, EXCHANGE, 'pagamento.#');
 
     console.log('[RabbitMQ] Conectado. Exchange:', EXCHANGE);
     connecting = false;
@@ -114,10 +102,9 @@ async function publishCupomAtualizado(data) { return await publish(EVENTS.CUPOM_
 async function publishCupomRemovido(id)     { return await publish(EVENTS.CUPOM_REMOVIDO, { cupom_id: Number(id) }); }
 
 
-async function publishPedidoCriado(data)     { return await publish(EVENTS.PEDIDO_CRIADO, data); }
-async function publishPedidoAtualizado(data) { return await publish(EVENTS.PEDIDO_ATUALIZADO, data); }
-async function publishPedidoRemovido(id)     { return await publish(EVENTS.PEDIDO_REMOVIDO, { pedido_id: Number(id) }); }
-
+async function publishPagamentoCriado(data)     { return await publish(EVENTS.PAGAMENTO_CRIADO, data); }
+async function publishPagamentoAtualizado(data) { return await publish(EVENTS.PAGAMENTO_ATUALIZADO, data); }
+async function publishPagamentoRemovido(id)     { return await publish(EVENTS.PAGAMENTO_REMOVIDO, { pagamento_id: Number(id) }); }
 
 function getChannel() {
   return channel;
@@ -140,7 +127,7 @@ module.exports = {
   publishCupomCriado,
   publishCupomAtualizado,
   publishCupomRemovido,
-  publishPedidoCriado,
-  publishPedidoAtualizado,
-  publishPedidoRemovido,
+  publishPagamentoCriado,
+  publishPagamentoAtualizado,
+  publishPagamentoRemovido,
 };
