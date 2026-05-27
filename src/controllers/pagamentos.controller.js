@@ -3,10 +3,11 @@ const prisma = require("../config/prisma");
 const rabbitMQ = require("../config/rabbitmq");
 
 class PagamentosController { 
-  // GET /pagamentos
+
   static async listar(req, res) { 
     try { 
-      const pagamentos = await prisma.pagamentos.findMany({ 
+      const pagamentos = await prisma.pagamentos.findMany({
+        where: { pagamento_status: 1 }, 
       }); 
 
       res.send(200, pagamentos); 
@@ -15,7 +16,7 @@ class PagamentosController {
     } 
   } 
 
-  // GET /pagamentos/{id}
+
   static async buscarPorId(req, res) { 
     try { 
       const { id } = req.params; 
@@ -34,7 +35,7 @@ class PagamentosController {
     } 
   } 
 
-  // GET /pagamentos/pedido/{id}
+
   static async buscarPorPedido(req, res) { 
     try { 
       const { id } = req.params; 
@@ -49,36 +50,39 @@ class PagamentosController {
     } 
   } 
 
-  // POST /pagamentos
+
   static async criar(req, res) { 
     try { 
-      const { pedido_id, cupom_id, valor_total } = req.body; 
+      const { pedido_id, cupom_id, pagamentos_valor } = req.body; 
       
       if (!pedido_id) { 
         return res.send(400, { message: "O pedido_id é obrigatório." }); 
       } 
-      
+      console.log(cupom_id)
+      const pagamentos_data = new Date();
       const novoPagamento = await prisma.pagamentos.create({ 
         data: { 
           pedido_id: Number(pedido_id), 
-          cupom_id: cupom_id ? Number(cupom_id) : null
+          cupom_id: cupom_id ? Number(cupom_id) : null,
+          pagamentos_data: pagamentos_data,
+          pagamentos_valor: pagamentos_valor
         } 
       }); 
 
-      // 📢 Notifica o RabbitMQ: Pedido criado através deste pagamento
-      await rabbitMQ.publishPedidoCriado({
-        pedido_id: novoPagamento.pedido_id,
+
+      await rabbitMQ.publishPagamentoCriado({
         pagamento_id: novoPagamento.pagamento_id || novoPagamento.id,
-        pedido_valor: valor_total ? Number(valor_total) : 0
+        pedido_id: novoPagamento.pedido_id,
+        pagamento_valor: pagamentos_valor ? Number(pagamentos_valor) : 0
       });
 
       res.send(201, novoPagamento); 
     } catch (error) { 
-      res.send(500, { message: "Erro ao criar o pagamento." }); 
+      res.send(500, { message: "Erro ao criar o pagamento.", error }); 
     } 
   } 
 
-  // PATCH /pagamentos/{id}
+
   static async atualizarStatus(req, res) { 
     try { 
       const { id } = req.params; 
@@ -93,9 +97,9 @@ class PagamentosController {
         data: { status: pagamento_status } 
       });
 
-      // 📢 Notifica o RabbitMQ: O estado do pedido correspondente mudou
-      await rabbitMQ.publishPedidoAtualizado({
-        pedido_id: pagamentoAtualizado.pedido_id,
+      // 📢 Notifica o RabbitMQ: Estado do pagamento alterado
+      await rabbitMQ.publishPagamentoAtualizado({
+        pagamento_id: pagamentoAtualizado.pagamento_id || pagamentoAtualizado.id,
         pagamento_status: pagamentoAtualizado.status
       });
 
@@ -105,18 +109,17 @@ class PagamentosController {
     } 
   } 
 
-  // DELETE /pagamentos/{id}
+
   static async remover(req, res) { 
     try { 
       const { id } = req.params; 
       
       const pagamentoRemovido = await prisma.pagamentos.update({
-        where: { id: Number(id) }, 
-        data: { status: 0 } 
+        where: { pagamento_id: Number(id) }, 
+        data: { pagamento_status: 0 } 
       });
 
-      // 📢 Notifica o RabbitMQ: Pedido cancelado/removido do fluxo comercial
-      await rabbitMQ.publishPedidoRemovido(pagamentoRemovido.pedido_id);
+      await rabbitMQ.publishPagamentoRemovido(pagamentoRemovido.pagamento_id || pagamentoRemovido.id);
 
       res.send(200, pagamentoRemovido); 
     } catch (error) { 
