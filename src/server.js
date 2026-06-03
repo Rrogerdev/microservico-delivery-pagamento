@@ -1,3 +1,4 @@
+require('dotenv').config();
 const restify = require("restify"); 
 const PagamentosController = require("./controllers/pagamentos.controller"); 
 const CuponsController = require("./controllers/cupons.controller"); 
