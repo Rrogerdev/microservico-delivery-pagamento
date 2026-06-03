@@ -3,7 +3,7 @@ const PagamentosController = require("./controllers/pagamentos.controller");
 const CuponsController = require("./controllers/cupons.controller"); 
 // Importa a conexão unificada do RabbitMQ
 const rabbitMQ = require("./config/rabbitmq"); 
-
+const { loadSecrets }    = require('./config/infisical');
 const server = restify.createServer({ 
   name: "api-delivery-pagamentos-restify" 
 }); 
@@ -29,6 +29,7 @@ const PORT = 9524;
 
 // Função assíncrona para garantir que o RabbitMQ conecte antes do app abrir as portas
 async function startServer() {
+    await loadSecrets();
   try {
     // 1. Inicializa a infraestrutura de mensageria
     await rabbitMQ.connect();
