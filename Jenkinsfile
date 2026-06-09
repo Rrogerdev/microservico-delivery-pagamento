@@ -8,6 +8,9 @@ pipeline {
         // Porta que o seu Fastify utiliza
         APP_PORT = "9524"
         DATABASE_URL="mysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_pagamento"
+        INFISICAL_PROJECT_ID = "e2ce3300-d12b-471d-8954-364aa184c184"
+        INFISICAL_ENV        = "prod"
+        INFISICAL_TOKEN      = "st.78331314-da2c-40d7-829c-64e1baa1a4a8.ce97554862d25689b83e5730d93756e7.5a84652d45eb8c9411c301ab944e9012"
     }
 
     stages {
