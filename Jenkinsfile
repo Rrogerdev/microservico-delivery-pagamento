@@ -27,7 +27,7 @@ pipeline {
                 echo 'Preparando dependências e gerando cliente do Prisma usando Infisical...'
                 sh 'npm install'
                 // Autentica e injeta as variáveis do ambiente (ex: production) para o Prisma
-                sh "npx @infisical/cli run --client-id=${INFISICAL_CLIENT_ID} --client-secret=${INFISICAL_CLIENT_SECRET} --env=production -- npx prisma generate"
+                sh "npx infisical run --client-id=${INFISICAL_CLIENT_ID} --client-secret=${INFISICAL_CLIENT_SECRET} --env=production -- npx prisma generate"
             }
         }
 
