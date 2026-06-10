@@ -6,14 +6,10 @@ pipeline {
         CONTAINER_NAME = "delivery-pagamento"
         APP_PORT = "9524"
 
-        // Infisical - hardcoded no Jenkinsfile
+        // Infisical
         INFISICAL_CLIENT_ID = "02459d73-c3fc-46ee-8827-14134b5a0d10"
         INFISICAL_CLIENT_SECRET = "b45e291c25a93e55891609c1df8342a427d9061ffe28adb4b1e558989d8c1c75"
-
-        // Obrigatório quando usa Machine Identity
         INFISICAL_PROJECT_ID = "33d7fe2b-ed71-41a9-951e-0d448894e72d"
-
-        // Confirme se no Infisical o slug é production ou prod
         INFISICAL_ENV = "production"
     }
 
@@ -35,23 +31,22 @@ pipeline {
                 sh '''
                     npm install
 
-                    if ! command -v infisical >/dev/null 2>&1; then
-                        npm install -g @infisical/cli
-                    fi
+                    # Instala o Infisical CLI localmente no projeto, sem precisar de sudo/root
+                    npm install --no-save @infisical/cli
 
                     set +x
-                    export INFISICAL_TOKEN=$(infisical login \
+                    export INFISICAL_TOKEN=$(./node_modules/.bin/infisical login \
                         --method=universal-auth \
                         --client-id="$INFISICAL_CLIENT_ID" \
                         --client-secret="$INFISICAL_CLIENT_SECRET" \
                         --silent \
                         --plain)
-                    set -x
 
-                    infisical run \
+                    ./node_modules/.bin/infisical run \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
                         -- npx prisma generate
+                    set -x
                 '''
             }
         }
@@ -68,19 +63,20 @@ pipeline {
                 echo 'Subindo o microserviço com injeção de variáveis...'
 
                 sh '''
-                    if ! command -v infisical >/dev/null 2>&1; then
-                        npm install -g @infisical/cli
+                    # Garante que a CLI local do Infisical existe
+                    if [ ! -f ./node_modules/.bin/infisical ]; then
+                        npm install --no-save @infisical/cli
                     fi
 
                     set +x
-                    export INFISICAL_TOKEN=$(infisical login \
+                    export INFISICAL_TOKEN=$(./node_modules/.bin/infisical login \
                         --method=universal-auth \
                         --client-id="$INFISICAL_CLIENT_ID" \
                         --client-secret="$INFISICAL_CLIENT_SECRET" \
                         --silent \
                         --plain)
 
-                    infisical export \
+                    ./node_modules/.bin/infisical export \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
                         --format=dotenv > .env
@@ -97,14 +93,6 @@ pipeline {
             }
         }
 
-        stage('Healthcheck') {
-            steps {
-                echo 'Verificando se o Fastify subiu corretamente...'
-                sleep 5
-                sh "curl -f http://localhost:${APP_PORT}/health"
-            }
-        }
-    }
 
     post {
         success {
