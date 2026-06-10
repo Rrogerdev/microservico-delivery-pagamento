@@ -10,7 +10,7 @@ pipeline {
         INFISICAL_CLIENT_ID = "02459d73-c3fc-46ee-8827-14134b5a0d10"
         INFISICAL_CLIENT_SECRET = "b45e291c25a93e55891609c1df8342a427d9061ffe28adb4b1e558989d8c1c75"
         INFISICAL_PROJECT_ID = "33d7fe2b-ed71-41a9-951e-0d448894e72d"
-        INFISICAL_ENV = "production"
+        INFISICAL_ENV = "prod"
         INFISICAL_SECRET_PATH = "/pasta"
     }
 
