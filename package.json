@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@infisical/sdk": "^5.0.2",
     "@prisma/client": "^6.19.3",
     "amqplib": "^2.0.1",
     "dotenv": "^17.4.2",
