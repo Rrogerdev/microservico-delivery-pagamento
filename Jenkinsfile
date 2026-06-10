@@ -17,8 +17,7 @@ pipeline {
                 script {
                     echo 'Limpando containers e imagens antigas...'
                     sh "docker stop ${CONTAINER_NAME} || exit 0"
-                    sh "docker rm ${CONTAINER_NAME} ||  exit 0"
-                    sh "docker rmi ${IMAGE_NAME}:latest ||  exit 0"
+                    sh "docker rm ${CONTAINER_NAME} || exit 0"
                 }
             }
         }
