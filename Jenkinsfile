@@ -6,9 +6,15 @@ pipeline {
         CONTAINER_NAME = "delivery-pagamento"
         APP_PORT = "9524"
 
-        // Credenciais do Infisical
+        // Infisical - hardcoded no Jenkinsfile
         INFISICAL_CLIENT_ID = "02459d73-c3fc-46ee-8827-14134b5a0d10"
         INFISICAL_CLIENT_SECRET = "b45e291c25a93e55891609c1df8342a427d9061ffe28adb4b1e558989d8c1c75"
+
+        // Obrigatório quando usa Machine Identity
+        INFISICAL_PROJECT_ID = "33d7fe2b-ed71-41a9-951e-0d448894e72d"
+
+        // Confirme se no Infisical o slug é production ou prod
+        INFISICAL_ENV = "production"
     }
 
     stages {
@@ -16,8 +22,8 @@ pipeline {
             steps {
                 script {
                     echo 'Limpando containers e imagens antigas...'
-                    sh "docker stop ${CONTAINER_NAME} || exit 0"
-                    sh "docker rm ${CONTAINER_NAME} || exit 0"
+                    sh "docker stop ${CONTAINER_NAME} || true"
+                    sh "docker rm ${CONTAINER_NAME} || true"
                 }
             }
         }
@@ -25,9 +31,28 @@ pipeline {
         stage('Install and Prisma Generate') {
             steps {
                 echo 'Preparando dependências e gerando cliente do Prisma usando Infisical...'
-                sh 'npm install'
-                // Autentica e injeta as variáveis do ambiente (ex: production) para o Prisma
-                sh "npx infisical run --client-id=${INFISICAL_CLIENT_ID} --client-secret=${INFISICAL_CLIENT_SECRET} --env=production -- npx prisma generate"
+
+                sh '''
+                    npm install
+
+                    if ! command -v infisical >/dev/null 2>&1; then
+                        npm install -g @infisical/cli
+                    fi
+
+                    set +x
+                    export INFISICAL_TOKEN=$(infisical login \
+                        --method=universal-auth \
+                        --client-id="$INFISICAL_CLIENT_ID" \
+                        --client-secret="$INFISICAL_CLIENT_SECRET" \
+                        --silent \
+                        --plain)
+                    set -x
+
+                    infisical run \
+                        --projectId="$INFISICAL_PROJECT_ID" \
+                        --env="$INFISICAL_ENV" \
+                        -- npx prisma generate
+                '''
             }
         }
 
@@ -41,21 +66,41 @@ pipeline {
         stage('Docker Run') {
             steps {
                 echo 'Subindo o microserviço com injeção de variáveis...'
-                // Exporta as variáveis do Infisical e as passa para dentro do container Docker
-                sh """
-                infisical export --client-id=${INFISICAL_CLIENT_ID} --client-secret=${INFISICAL_CLIENT_SECRET} --env=production --format=dotenv > .env
-                docker run -d --name ${CONTAINER_NAME} --env-file .env -p ${APP_PORT}:${APP_PORT} ${IMAGE_NAME}:latest
-                rm .env
-                """
+
+                sh '''
+                    if ! command -v infisical >/dev/null 2>&1; then
+                        npm install -g @infisical/cli
+                    fi
+
+                    set +x
+                    export INFISICAL_TOKEN=$(infisical login \
+                        --method=universal-auth \
+                        --client-id="$INFISICAL_CLIENT_ID" \
+                        --client-secret="$INFISICAL_CLIENT_SECRET" \
+                        --silent \
+                        --plain)
+
+                    infisical export \
+                        --projectId="$INFISICAL_PROJECT_ID" \
+                        --env="$INFISICAL_ENV" \
+                        --format=dotenv > .env
+                    set -x
+
+                    docker run -d \
+                        --name ${CONTAINER_NAME} \
+                        --env-file .env \
+                        -p ${APP_PORT}:${APP_PORT} \
+                        ${IMAGE_NAME}:latest
+
+                    rm -f .env
+                '''
             }
         }
-        
+
         stage('Healthcheck') {
             steps {
                 echo 'Verificando se o Fastify subiu corretamente...'
-                // Aguarda o processo inicializar antes de testar
                 sleep 5
-                // Sem o '|| echo', se falhar o curl, o pipeline falha corretamente
                 sh "curl -f http://localhost:${APP_PORT}/health"
             }
         }
@@ -67,6 +112,7 @@ pipeline {
         }
         failure {
             echo 'Erro no pipeline. Verifique os logs do Docker ou do Prisma.'
+            sh "docker logs ${CONTAINER_NAME} || true"
         }
     }
 }
