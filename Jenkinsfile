@@ -29,9 +29,8 @@ pipeline {
         stage('Install and Prisma Generate') {
             steps {
                 echo 'Preparando dependências e Prisma...'
-                // Rodamos o install localmente para garantir que o build Docker tenha o contexto
                 sh 'npm install'
-                sh 'npx prisma generate'
+                sh "DATABASE_URL='${DATABASE_URL}' npx prisma generate"
             }
         }
 
