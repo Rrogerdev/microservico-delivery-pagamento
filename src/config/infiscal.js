@@ -6,14 +6,14 @@
 const { InfisicalSDK } = require('@infisical/sdk');
  
 const INFISICAL_TOKEN      = process.env.INFISICAL_TOKEN      || 'st.78331314-da2c-40d7-829c-64e1baa1a4a8.ce97554862d25689b83e5730d93756e7.5a84652d45eb8c9411c301ab944e9012';
-const INFISICAL_PROJECT_ID = process.env.INFISICAL_PROJECT_ID || 'e2ce3300-d12b-471d-8954-364aa184c184';
+const INFISICAL_PROJECT_ID = process.env.INFISICAL_PROJECT_ID || '33d7fe2b-ed71-41a9-951e-0d448894e72d';
 const INFISICAL_ENV        = process.env.INFISICAL_ENV        || 'prod';
  
 async function loadSecrets() {
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('[Infisical] NODE_ENV !== production — usando variáveis locais (.env)');
-    return;
-  }
+  // if (process.env.NODE_ENV !== 'production') {
+  //   console.log('[Infisical] NODE_ENV !== production — usando variáveis locais (.env)');
+  //   return;
+  // }
  
   try {
     console.log(`[Infisical] Conectando... projeto: ${INFISICAL_PROJECT_ID} | ambiente: ${INFISICAL_ENV}`);
