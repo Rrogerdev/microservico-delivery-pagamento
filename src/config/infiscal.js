@@ -27,7 +27,7 @@ async function loadSecrets() {
     const { secrets } = await client.secrets().listSecrets({
       projectId:   INFISICAL_PROJECT_ID,
       environment: INFISICAL_ENV,
-      secretPath:  '/',
+      secretPath:  '/pasta',
     });
  
     let count = 0;
