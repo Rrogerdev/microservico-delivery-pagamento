@@ -36,7 +36,7 @@ async function loadSecrets() {
         count++;
       }
     }
- 
+   console.log(process.env);
     console.log(`[Infisical] ✅ ${count} secret(s) carregado(s).`);
   } catch (err) {
     console.error('[Infisical] ❌ Erro ao carregar secrets:', err.message);
