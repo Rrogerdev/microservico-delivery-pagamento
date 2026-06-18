@@ -5,7 +5,8 @@
  
 const { InfisicalSDK } = require('@infisical/sdk');
  
-const INFISICAL_TOKEN      = process.env.INFISICAL_TOKEN      || 'st.b069add6-1345-498f-9e46-68958e4afcd3.c427e1d9f6a952f550e525abb4be70fd.d31a3c7b7dacea2ba83748258b948c6d';
+// const INFISICAL_TOKEN      = process.env.INFISICAL_TOKEN      || 'st.b069add6-1345-498f-9e46-68958e4afcd3.c427e1d9f6a952f550e525abb4be70fd.d31a3c7b7dacea2ba83748258b948c6d';
+const INFISICAL_TOKEN      = process.env.INFISICAL_TOKEN      || 'st.f66350f1-9449-4085-8b29-501454bd464f.9c8831ed0320b542e8fb1fd49de64861.d2afe2e159108fc76dc25942c7fbb143';
 const INFISICAL_PROJECT_ID = process.env.INFISICAL_PROJECT_ID || '33d7fe2b-ed71-41a9-951e-0d448894e72d';
 const INFISICAL_ENV        = process.env.INFISICAL_ENV        || 'prod';
  
