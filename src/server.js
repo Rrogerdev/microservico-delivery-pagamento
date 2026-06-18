@@ -3,7 +3,7 @@ const PagamentosController = require("./controllers/pagamentos.controller");
 const CuponsController = require("./controllers/cupons.controller"); 
 // Importa a conexão unificada do RabbitMQ
 const rabbitMQ = require("./config/rabbitmq"); 
-const { loadSecrets } = require("./config/infisical");
+const { loadSecrets } = require("./config/infiscal");
 const server = restify.createServer({ 
   name: "api-delivery-pagamentos-restify" 
 }); 
