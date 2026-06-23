@@ -11,23 +11,26 @@ const INFISICAL_PROJECT_ID = process.env.INFISICAL_PROJECT_ID || '33d7fe2b-ed71-
 const INFISICAL_ENV        = process.env.INFISICAL_ENV        || 'prod';
  
 async function loadSecrets() {
-  // if (process.env.NODE_ENV !== 'production') {
-  //   console.log('[Infisical] NODE_ENV !== production — usando variáveis locais (.env)');
-  //   return;
-  // }
- 
   try {
-    console.log(`[Infisical] Conectando... projeto: ${INFISICAL_PROJECT_ID} | ambiente: ${INFISICAL_ENV}`);
+    console.log(`[Infisical] Conectando... projeto: ${INFISICAL_PROJECT_ID} | ambiente: ${INFISICAL_ENV} | path: ${INFISICAL_SECRET_PATH}`);
  
     const client = new InfisicalSDK({ siteUrl: 'https://app.infisical.com' });
  
-    // SDK v5: Service Token usa accessToken() diretamente
-    await client.auth().accessToken(INFISICAL_TOKEN);
+    if (INFISICAL_CLIENT_ID && INFISICAL_CLIENT_SECRET) {
+      console.log('[Infisical] Autenticando com Universal Auth (Machine Identity)...');
+      await client.auth().universalAuth.login({
+        clientId: INFISICAL_CLIENT_ID,
+        clientSecret: INFISICAL_CLIENT_SECRET
+      });
+    } else {
+      console.log('[Infisical] Autenticando com Service Token...');
+      await client.auth().accessToken(INFISICAL_TOKEN);
+    }
  
     const { secrets } = await client.secrets().listSecrets({
       projectId:   INFISICAL_PROJECT_ID,
       environment: INFISICAL_ENV,
-      secretPath:  '/pasta',
+      secretPath:  INFISICAL_SECRET_PATH,
     });
  
     let count = 0;
@@ -37,11 +40,10 @@ async function loadSecrets() {
         count++;
       }
     }
-   console.log(process.env);
+ 
     console.log(`[Infisical] ✅ ${count} secret(s) carregado(s).`);
   } catch (err) {
     console.error('[Infisical] ❌ Erro ao carregar secrets:', err.message);
-    process.exit(1);
   }
 }
  
