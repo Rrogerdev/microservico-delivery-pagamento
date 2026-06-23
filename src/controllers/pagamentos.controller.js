@@ -12,7 +12,7 @@ class PagamentosController {
 
       res.send(200, pagamentos); 
     } catch (error) { 
-      res.send(500, { message: "Erro ao listar pagamentos.", error }); 
+      res.send(500, { message: "Erro ao listar pagamentos.", error.message }); 
     } 
   } 
 
