@@ -11,7 +11,7 @@ module.exports = new Proxy({}, {
   get(_, prop) {
     if (!prisma) {
       prisma = new PrismaClient();
-      console.log("Prisma: Client inicializado com sucesso. Rodando em:" + process.env.DATABASE_PAGAMENTOS_URL);
+      console.log("Prisma: Client inicializado com sucesso. Rodando em valor database:" + process.env.DATABASE_PAGAMENTOS_URL);
     }
     return prisma[prop];
   }
