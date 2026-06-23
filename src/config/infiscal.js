@@ -9,7 +9,10 @@ const { InfisicalSDK } = require('@infisical/sdk');
 const INFISICAL_TOKEN      = process.env.INFISICAL_TOKEN      || 'st.f66350f1-9449-4085-8b29-501454bd464f.9c8831ed0320b542e8fb1fd49de64861.d2afe2e159108fc76dc25942c7fbb143';
 const INFISICAL_PROJECT_ID = process.env.INFISICAL_PROJECT_ID || '33d7fe2b-ed71-41a9-951e-0d448894e72d';
 const INFISICAL_ENV        = process.env.INFISICAL_ENV        || 'prod';
- 
+const INFISICAL_SECRET_PATH = process.env.INFISICAL_SECRET_PATH || '/pasta';
+
+const INFISICAL_CLIENT_ID   = process.env.INFISICAL_CLIENT_ID   || process.env.CLIENT_ID;
+const INFISICAL_CLIENT_SECRET = process.env.INFISICAL_CLIENT_SECRET || process.env.CLIENT_SECRET;
 async function loadSecrets() {
   try {
     console.log(`[Infisical] Conectando... projeto: ${INFISICAL_PROJECT_ID} | ambiente: ${INFISICAL_ENV} | path: ${INFISICAL_SECRET_PATH}`);
