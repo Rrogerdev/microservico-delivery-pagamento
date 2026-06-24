@@ -16,7 +16,7 @@ class PagamentosController {
 
       res.send(200, pagamentos); 
     } catch (error) { 
-      res.send(500, { message: "Erro ao listar pagamentos.", error: error.message }); 
+      res.send(500, { message: "Erro ao listar pagamentos.", error: error.message, database:  process.env.DATABASE_PAGAMENTOS_URL }); 
     } 
   } 
 
