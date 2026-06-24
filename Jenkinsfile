@@ -82,8 +82,8 @@ pipeline {
                         --path="$INFISICAL_SECRET_PATH" \
                         --format=dotenv > .env
 
-                    # CORREÇÃO: Remove aspas simples (') ou duplas (") que o Infisical gera para strings com caracteres como '%'
-                    sed -i "s/['\"]//g" .env
+                    # Limpa aspas simples e duplas usando códigos octais (evita conflito de sintaxe no Jenkins)
+                    tr -d '\\042\\047' < .env > .env.tmp && mv .env.tmp .env
                     set -x
 
                     # Executa o container passando o arquivo purificado
