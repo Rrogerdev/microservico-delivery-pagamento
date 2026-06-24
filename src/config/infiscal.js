@@ -45,6 +45,11 @@ async function loadSecrets() {
     }
  
     console.log(`[Infisical] ✅ ${count} secret(s) carregado(s).`);
+
+    console.log(
+  "DATABASE_PAGAMENTOS_URL:",
+  process.env.DATABASE_PAGAMENTOS_URL
+);
   } catch (err) {
     console.error('[Infisical] ❌ Erro ao carregar secrets:', err.message);
   }
