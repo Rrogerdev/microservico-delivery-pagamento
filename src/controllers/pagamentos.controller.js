@@ -6,6 +6,10 @@ class PagamentosController {
 
   static async listar(req, res) { 
     try { 
+          console.log(
+      "DATABASE_PAGAMENTOS_URL ANTES DO FINDMANY =",
+      process.env.DATABASE_PAGAMENTOS_URL
+    );
       const pagamentos = await prisma.pagamentos.findMany({
         where: { pagamento_status: 1 }, 
       }); 
