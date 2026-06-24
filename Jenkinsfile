@@ -31,8 +31,6 @@ pipeline {
 
                 sh '''
                     npm install
-
-                    # Instala o Infisical CLI localmente no projeto, sem precisar de sudo/root
                     npm install --no-save @infisical/cli
 
                     set +x
@@ -46,6 +44,7 @@ pipeline {
                     ./node_modules/.bin/infisical run \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
+                        --path="$INFISICAL_SECRET_PATH" \
                         -- npx prisma generate
                     set -x
                 '''
@@ -64,7 +63,6 @@ pipeline {
                 echo 'Subindo o microserviço com injeção de variáveis...'
 
                 sh '''
-                    # Garante que a CLI local do Infisical existe
                     if [ ! -f ./node_modules/.bin/infisical ]; then
                         npm install --no-save @infisical/cli
                     fi
@@ -77,9 +75,11 @@ pipeline {
                         --silent \
                         --plain)
 
+                    # Exporta os segredos do caminho correto apontado na variável
                     ./node_modules/.bin/infisical export \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
+                        --path="$INFISICAL_SECRET_PATH" \
                         --format=dotenv > .env
                     set -x
 
