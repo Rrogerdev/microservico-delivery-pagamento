@@ -75,12 +75,15 @@ pipeline {
                         --silent \
                         --plain)
 
-                    # Exporta os segredos do caminho correto apontado na variável
+                    # Exporta os segredos do Infisical usando o caminho especificado
                     ./node_modules/.bin/infisical export \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
                         --path="$INFISICAL_SECRET_PATH" \
                         --format=dotenv > .env
+
+                    # Remove as aspas duplas dos valores para evitar falhas de validação do protocolo no Prisma
+                    sed -i 's/"//g' .env
                     set -x
 
                     docker run -d \
