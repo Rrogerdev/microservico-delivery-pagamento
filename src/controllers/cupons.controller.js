@@ -51,6 +51,25 @@ class CuponsController {
     } 
   } 
 
+  static async buscarPorCodigo(req, res) {
+  try {
+    const { cupom_codigo } = req.params;
+
+    const cupom = await prisma.cupons.findUnique({
+      where: {
+        cupom_codigo: cupom_codigo
+      }
+    });
+
+    if (!cupom) {
+      return res.send(404, { message: "Cupom não encontrado." });
+    }
+
+    res.send(200, cupom);
+  } catch (error) {
+    res.send(500, { message: "Erro ao buscar cupom." });
+  }
+}
   // PATCH /cupons/{id}
   static async atualizar(req, res) { 
     try { 
