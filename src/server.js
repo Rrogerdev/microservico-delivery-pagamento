@@ -1,6 +1,8 @@
 const restify = require("restify"); 
 const PagamentosController = require("./controllers/pagamentos.controller"); 
 const CuponsController = require("./controllers/cupons.controller"); 
+const { authenticateToken } = require("./middlewares/authenticateToken");
+
 // Importa a conexão unificada do RabbitMQ
 const rabbitMQ = require("./config/rabbitmq"); 
 const { loadSecrets } = require("./config/infiscal");
@@ -28,19 +30,20 @@ server.use(restify.plugins.queryParser());
 server.use(restify.plugins.bodyParser()); 
 
 // Rotas de Pagamentos
-server.get("/pagamentos", PagamentosController.listar); 
-server.get("/pagamentos/:id", PagamentosController.buscarPorId); 
-server.get("/pagamentos/pedido/:id", PagamentosController.buscarPorPedido); 
-server.post("/pagamentos", PagamentosController.criar); 
-server.patch("/pagamentos/:id", PagamentosController.atualizarStatus); 
-server.del("/pagamentos/:id", PagamentosController.remover); 
+server.get("/pagamentos", authenticateToken, PagamentosController.listar); 
+server.get("/pagamentos/pedido/:id", authenticateToken, PagamentosController.buscarPorPedido); 
+server.get("/pagamentos/:id", authenticateToken, PagamentosController.buscarPorId); 
+
+server.post("/pagamentos", authenticateToken, PagamentosController.criar); 
+server.patch("/pagamentos/:id", authenticateToken, PagamentosController.atualizarStatus); 
+server.del("/pagamentos/:id", authenticateToken, PagamentosController.remover); 
 
 // Rotas de Cupons
-server.get("/cupons/:id", CuponsController.buscarPorId); 
-server.post("/cupons", CuponsController.criar); 
-server.patch("/cupons/:id", CuponsController.atualizar); 
-server.del("/cupons/:id", CuponsController.deletar); 
-server.get("/cupons/codigo/:cupom_codigo", CuponsController.buscarPorCodigo); 
+server.get("/cupons/:id", authenticateToken, CuponsController.buscarPorId); 
+server.post("/cupons", authenticateToken, CuponsController.criar); 
+server.patch("/cupons/:id", authenticateToken, CuponsController.atualizar); 
+server.del("/cupons/:id", authenticateToken, CuponsController.deletar); 
+server.get("/cupons/codigo/:cupom_codigo", authenticateToken, CuponsController.buscarPorCodigo); 
 
 const PORT = 9524; 
 
