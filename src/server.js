@@ -7,6 +7,11 @@ const { loadSecrets } = require("./config/infiscal");
 const server = restify.createServer({ 
   name: "api-delivery-pagamentos-restify" 
 }); 
+server.pre((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  return next();
+});
 
 server.use(restify.plugins.queryParser()); 
 server.use(restify.plugins.bodyParser()); 
