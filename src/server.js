@@ -12,7 +12,13 @@ server.pre((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
   return next();
 });
-
+server.opts("/*", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.send(200);
+  return next();
+});
 server.use(restify.plugins.queryParser()); 
 server.use(restify.plugins.bodyParser()); 
 
