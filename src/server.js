@@ -29,6 +29,7 @@ server.get("/cupons/:id", CuponsController.buscarPorId);
 server.post("/cupons", CuponsController.criar); 
 server.patch("/cupons/:id", CuponsController.atualizar); 
 server.del("/cupons/:id", CuponsController.deletar); 
+server.get("/cupons/codigo/:cupom_codigo", CuponsController.buscarPorCodigo); 
 
 const PORT = 9524; 
 
